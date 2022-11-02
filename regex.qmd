@@ -111,7 +111,7 @@ nchar(c("flying", "microtonal", "banana", ""))
 - tidyverse package "stringr"^[[https://stringr.tidyverse.org](https://stringr.tidyverse.org)] contains analogous verbs with more consistent syntax
 
 ```{r}
-library(stringr)
+library(tidyverse)
 ```
 
 
@@ -244,6 +244,56 @@ Source:
 - Patterns ‘⁠(?<=...)⁠’ and ‘⁠(?<!...)⁠’ are the lookbehind equivalents
 
 > Negative lookahead is indispensable if you want to match something not followed by something else
+
+## Categorical variables
+
+- Categorical variables are variables that have a fixed and known set of possible values
+- Currently, you don't need them a lot, only in very specific occasions related to plotting
+
+
+## Reordering axis with base R
+
+```{r}
+data <- tribble(~key,~value,
+               "ctrl", 120,
+               "abs1", 23,
+               "base4", 55
+)
+ggplot(data, aes(x = key, y = value)) + 
+  geom_col() 
+```
+
+## Arbitrary reordering
+
+```{r}
+ggplot(data, aes(x = factor(key, levels = c("ctrl", "abs1", "base4")), y = value)) + 
+  geom_col() 
+```
+
+
+## forcats
+
+- `fct_reorder`: Reordering a factor by another variable.
+- `fct_infreq`: Reordering a factor by the frequency of values.
+
+> **forcats** package is loaded with **tidyverse** package
+
+## Reordering by frequency
+
+Example of a plot where y-axis is in alphanumerical order (default)
+```{r}
+ggplot(starwars, aes(y = hair_color)) + 
+  geom_bar() 
+```
+
+
+## Reordering by frequency, cont.
+
+
+```{r}
+ggplot(starwars, aes(y = fct_infreq(hair_color))) + 
+  geom_bar() 
+```
 
 
 
