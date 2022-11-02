@@ -195,11 +195,13 @@ Source:
 
 ## Character classes, cont.
 
-- [:alnum:] includes alphanumerics ([:alpha:] and [:digit:]);
+- [:alnum:] includes alphanumerics ([:alpha:] and [:digit:]); ^[These notations are independent of locale and character set, see regex help for more details]
 - [:alpha:], includes alphabetic characters ([:upper:] and [:lower:] case);
 - [:punct:] includes punctuation characters ! " # $ % & ’ ( ) * + , - . / : ; < = > ? @ [  ] ^ _ ` ` { | } ~.;
 - [:blank:] includes space and tab; etc.
 
+:::aside
+:::
 
 ## Metacharacters with special meaning
 
@@ -220,7 +222,31 @@ Source:
 
 - The caret ^ and the dollar sign $ are metacharacters that respectively match the empty string at the beginning and end of a line.
 
-## Difficult stuff
 
-- Matching based on string that precede or follow match
+## Concatenating regular expressions
+
+- Regular expressions can be concatenated by using "|" operator, resulting in string matches matching either subexpression
+
+## Groups
+
+- A group is a part of a regex pattern enclosed in parentheses () metacharacter. For example, the regular expression (cat) creates a single group containing the letters 'c', 'a', and 't'
+
+> Groups allow to extract information for further processing
+
+## Groups, cont.
+
+- For example, you could use a pattern `"^(IMG\\d+\\.png)$"` to capture and extract the **full filename**, 
+- but if you only wanted to capture the **filename without the extension**, you could use the pattern `"^(IMG\\d+)\\.png$"` which only captures the part before the period
+
+## Lookahead and lookbehind
+
+- Patterns ‘⁠(?=...)⁠’ and ‘⁠(?!...)⁠’ are zero-width positive and negative lookahead assertions: they match if an attempt to match the ... forward from the current position would succeed (or not), but use up no characters in the string being processed. 
+- Patterns ‘⁠(?<=...)⁠’ and ‘⁠(?<!...)⁠’ are the lookbehind equivalents
+
+> Negative lookahead is indispensable if you want to match something not followed by something else
+
+
+
+
+
 
