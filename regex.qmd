@@ -1,0 +1,226 @@
+---
+title: "regex"
+subtitle: "LOTI.02.015 Reprodutseeritav andmeanalüüs R-keeles"
+author: "Taavi Päll"
+date: "2022-11-02"
+format:
+  revealjs: 
+    theme: [serif]
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Getting help
+
+regex help can be accessed in R as usually from console:
+```{r, eval=FALSE}
+?regex
+```
+Or type in RStudio Help tab "regex" or "regular expression"
+
+## What is regex
+
+- A "regular expression" is a pattern that describes a set of strings
+  - e.g. regex "banana" matches "banana" in "flying microtonal **banana**"or
+  - regex "na" matches "na" in "flying microto**na**l ba**nana**"
+
+## Common operations with regular expressions
+
+- Locate a pattern match (index/positions)
+- Extract a matched pattern
+- Identify a match to a pattern
+- Replace a matched pattern
+
+## Base R pattern matching and replacement
+
+- Character strings can be matched and manipulated in base R by using regular expressions in functions `grep`, `grepl`, `sub`, `gsub`, regexpr + regmatches and some others
+
+
+## How these base R regex functions work
+
+```{r}
+?grep
+```
+
+
+```
+grep {base}	R Documentation
+Pattern Matching and Replacement
+Description
+grep, grepl, regexpr, gregexpr, regexec and gregexec search for matches to argument pattern within each element of a character vector: they differ in the format of and amount of detail in the results.
+
+sub and gsub perform replacement of the first and all matches respectively.
+
+Usage
+grep(pattern, x, ignore.case = FALSE, perl = FALSE, value = FALSE,
+     fixed = FALSE, useBytes = FALSE, invert = FALSE)
+```
+
+> Notice that in base R regex matching functions 'pattern' is the first argument
+
+
+## Usage of some base R regex verbs
+
+::: {.incremental}
+- `grep` returns index of matching elements
+```{r}
+grep("na", c("flying", "microtonal", "banana"))
+```
+
+- `grepl` returns logical vector of matching elements
+```{r}
+grepl("na", c("flying", "microtonal", "banana"))
+```
+:::
+
+## Usage of some base R regex verbs, cont.
+
+::: {.incremental}
+- `sub` replaces first occurence of regex
+```{r}
+sub("na", "NA", c("flying", "microtonal", "banana"))
+```
+
+- `gsub` replaces all occurences of regex
+```{r}
+gsub("na", "NA", c("flying", "microtonal", "banana"))
+```
+:::
+
+
+## String splitting & string length
+
+- String can be splitted with `strsplit`
+```{r}
+strsplit("flying microtonal banana", " ")
+```
+
+> Note that here is data first argument..
+
+- String length
+```{r}
+nchar(c("flying", "microtonal", "banana", ""))
+```
+
+
+
+## tidyverse regex functions
+
+- tidyverse package "stringr"^[[https://stringr.tidyverse.org](https://stringr.tidyverse.org)] contains analogous verbs with more consistent syntax
+
+```{r}
+library(stringr)
+```
+
+
+- Importantly, *stringr* produces outputs than can easily be used as inputs. This includes ensuring that missing inputs result in missing outputs, and zero length inputs result in zero length outputs.
+
+:::aside
+Package webpage with cheatsheets and more examples:
+:::
+
+
+## Usage of tidyverse regex verbs
+
+::: {.incremental}
+- `str_which` (`grep`) returns index
+```{r}
+str_which(c("flying", "microtonal", "banana"), "na")
+```
+
+- `str_detect` (`grepl`) returns logical vector
+```{r}
+str_detect(c("flying", "microtonal", "banana"), "na")
+```
+:::
+
+## Usage of tidyverse regex verbs, cont.
+
+::: {.incremental}
+- `str_replace` (`sub`) replaces first occurrence
+```{r}
+str_replace(c("flying", "microtonal", "banana"), "na", "NA")
+```
+
+- `str_detect_all` (`gsub`) replaces all occurrences
+```{r}
+str_replace_all(c("flying", "microtonal", "banana"), "na", "NA")
+```
+:::
+
+
+## String splitting and string length tidyverse way
+
+- String split 
+```{r}
+str_split("flying microtonal banana", " ")
+```
+
+> Notice that both string splitting (`strsplit` and `str_split`) functions return a list
+
+- String length
+```{r}
+str_length(c("flying", "microtonal", "banana", ""))
+```
+
+
+
+## Main question, of cause, is how to define those "pattern"
+
+- e.g. here is a regex to match any URL^[[https://stackoverflow.com/questions/161738/what-is-the-best-regular-expression-to-check-if-a-string-is-a-valid-url](https://stackoverflow.com/questions/161738/what-is-the-best-regular-expression-to-check-if-a-string-is-a-valid-url)]
+```{r, eval=FALSE}
+"^[a-z](?:[-a-z0-9\+\.])*:(?:\/\/(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:])*@)?(?:\[(?:(?:(?:[0-9a-f]{1,4}:){6}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|::(?:[0-9a-f]{1,4}:){5}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){4}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:(?:[0-9a-f]{1,4}:){0,1}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){3}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:(?:[0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){2}(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:(?:[0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:(?:[0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3})|(?:(?:[0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(?:(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::)|v[0-9a-f]+\.[-a-z0-9\._~!\$&'\(\)\*\+,;=:]+)\]|(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(?:\.(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}|(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=])*)(?::[0-9]*)?(?:\/(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:@]))*)*|\/(?:(?:(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:@]))+)(?:\/(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:@]))*)*)?|(?:(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:@]))+)(?:\/(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:@]))*)*|(?!(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:@])))(?:\?(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:@])|[\x{E000}-\x{F8FF}\x{F0000}-\x{FFFFD}\x{100000}-\x{10FFFD}\/\?])*)?(?:\#(?:(?:%[0-9a-f][0-9a-f]|[-a-z0-9\._~\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}!\$&'\(\)\*\+,;=:@])|[\/\?])*)?$"
+```
+
+:::aside
+Source:
+:::
+
+## Regular Expressions as used in R
+
+- Most characters, including all letters and digits, are regular expressions that match themselves. 
+
+- Whereas, e.g. . matches any single character.
+
+- You can refer also to a character class, which is a list of characters enclosed between [ and ], e.g. [[:alnum:]] is same as [A-z0-9].
+
+## Character classes
+
+- A character class is a list of characters enclosed between "⁠[⁠" and "⁠]⁠" which matches any single character in that list; unless the first character of the list is the caret "⁠^⁠", when it matches any character not in the list. 
+- For example, the regular expression "⁠[0123456789]⁠" matches any single digit, and "⁠[^abc]⁠" matches anything except the characters "⁠a⁠", "⁠b⁠" or "⁠c⁠".
+- "[0123456789]" can be replaced with "[0-9]"
+
+
+## Character classes, cont.
+
+- [:alnum:] includes alphanumerics ([:alpha:] and [:digit:]);
+- [:alpha:], includes alphabetic characters ([:upper:] and [:lower:] case);
+- [:punct:] includes punctuation characters ! " # $ % & ’ ( ) * + , - . / : ; < = > ? @ [  ] ^ _ ` ` { | } ~.;
+- [:blank:] includes space and tab; etc.
+
+
+## Metacharacters with special meaning
+
+- The metacharacters in regular expressions are . \ | ( ) [ { ^ $ * + ?, whether these have a special meaning depends on the context
+- When matching any metacharacter as a regular character, precede it with a double backslash "\\".
+
+## Repetition, repetition, repetition
+
+- Repetition quantifiers put after regex specify how many times regex is matched: 
+  - ?, optional, at most once; 
+  - *, zero or more times; 
+  - +, one or more times; 
+  - {n}, n times; 
+  - {n,}, n or more times; 
+  - {n,m}, n to m times.
+
+## Matching string beginning and end
+
+- The caret ^ and the dollar sign $ are metacharacters that respectively match the empty string at the beginning and end of a line.
+
+## Difficult stuff
+
+- Matching based on string that precede or follow match
+
