@@ -12,7 +12,7 @@ format:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# regex
+# Regex
 
 ## Getting help
 
@@ -311,6 +311,36 @@ ggplot(detools, aes(y = fct_rev(fct_infreq(program)))) +
   geom_bar() 
 ```
 
+## Reordering by another variable
+
+Let's say we want to reorder plot axis by some summary value
+```{r}
+microbiome <- read_csv("data/microbiome.csv")
+top20 <- microbiome %>% 
+  group_by(Genus) %>% 
+  summarise_at("counts", sum) %>% 
+  top_n(20, counts)
+top20 %>% 
+  ggplot(aes(x = counts, y = Genus)) +
+  geom_col()
+```
+
+## Reordering by another variable, cont.
+
+```{r}
+top20 %>% 
+  ggplot(aes(x = counts, y = fct_reorder(Genus, counts))) +
+  geom_col()
+```
 
 
+
+## Collapsing the least frequent values of a factor into "other"
+
+Let's say we want to merge programs that represent less than 5%
+```{r}
+detools %>%
+  mutate(program = fct_lump(program, prop = 0.05, other_level = "other")) %>%
+  count(program, sort = TRUE)
+```
 
